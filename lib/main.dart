@@ -8,16 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const EmojiDex());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class EmojiDex extends StatelessWidget {
+  const EmojiDex({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Posts',
+      title: 'Emojis',
       theme: ThemeData(primarySwatch: Colors.blueGrey),
       initialRoute: '/',
       routes: {
@@ -90,10 +90,10 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  ListView buildList(List<Emoji>? posts) {
-    if (posts == null) return ListView();
+  ListView buildList(List<Emoji>? emojis) {
+    if (emojis == null) return ListView();
     return ListView(
-      children: posts.map((e) => buildListItem(e)).toList(),
+      children: emojis.map((e) => buildListItem(e)).toList(),
     );
   }
 
@@ -106,7 +106,7 @@ class _MainPageState extends State<MainPage> {
       ),
       margin: const EdgeInsets.all(8),
       child: ListTile(
-        title: Text(emoji.emoji),
+        title: Text(emoji.toString()),
         subtitle: Text(emoji.name),
         trailing: Text("ID: ${emoji.id}"),
         textColor: Colors.white,
