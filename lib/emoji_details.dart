@@ -1,5 +1,7 @@
 import 'package:emoji_dex/domain/emoji.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EmojiDetailsPage extends StatefulWidget {
   const EmojiDetailsPage({Key? key}) : super(key: key);
@@ -11,11 +13,53 @@ class EmojiDetailsPage extends StatefulWidget {
 }
 
 class _EmojiDetailsPageState extends State<EmojiDetailsPage> {
+  static const String keyPrefFavoriteIds = 'favorites';
+  Set<int> favoriteIds = Set();
+
+  @override
+  void initState() {
+    super.initState();
+    loadPrefs();
+  }
+
+  Future<void> loadPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? items = prefs.getStringList(keyPrefFavoriteIds);
+    if (items == null) return;
+
+    setState(() {
+      favoriteIds.addAll(items.map((e) => int.parse(e)));
+    });
+  }
+
+  Future<void> toggleLike(Emoji emoji) async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      bool canAdd = favoriteIds.add(emoji.id);
+      if (!canAdd) {
+        favoriteIds.remove(emoji.id);
+      }
+
+      prefs.setStringList(
+          keyPrefFavoriteIds, favoriteIds.map((e) => e.toString()).toList());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     Emoji emoji = ModalRoute.of(context)?.settings.arguments as Emoji;
+    var color =
+        favoriteIds.contains(emoji.id) ? Colors.red.shade800 : Colors.black38;
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        label: Text('Favorito', style: TextStyle(color: color)),
+        isExtended: true,
+        backgroundColor: Colors.red.shade50,
+        icon: Icon(Icons.favorite_border, color: color),
+        onPressed: () {
+          toggleLike(emoji);
+        },
+      ),
       appBar: AppBar(
         title: const Text('Detalhes'),
         backgroundColor: Colors.blueGrey.shade900,
@@ -27,9 +71,17 @@ class _EmojiDetailsPageState extends State<EmojiDetailsPage> {
             height: 240,
             color: Colors.blueGrey.shade900,
             child: Center(
-              child: Text(
-                emoji.emoji,
-                style: const TextStyle(fontSize: 128),
+              child: InkWell(
+                child: Text(
+                  emoji.emoji,
+                  style: const TextStyle(fontSize: 128),
+                ),
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: emoji.emoji));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Copiado para a área de transferência'))
+                  );
+                },
               ),
             ),
           ),
