@@ -7,6 +7,7 @@ import 'package:emoji_dex/emoji_details.dart';
 import 'package:emoji_dex/search/search_delegate.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const EmojiDex());
@@ -38,6 +39,8 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   static const pageSize = 20;
+  static const String keyPrefFavoriteIds = 'favorites';
+  Set<int> favoriteIds = {};
   late Future<List<Emoji>> emojis;
   final EmojiRepository _postsRepository =
       EmojiRepositoryImpl(EmojiMapper(), GetResponseUseCase());
@@ -50,6 +53,7 @@ class _MainPageState extends State<MainPage> {
       _fetchPage(pageKey);
     });
     super.initState();
+    loadPrefs();
     emojis = _postsRepository.getRandomEmojis();
   }
 
@@ -113,6 +117,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   Card buildListItem(Emoji emoji) {
+    var color =
+    favoriteIds.contains(emoji.id) ? Colors.yellow.shade800 : Colors.white38;
+
     return Card(
       color: Colors.blueGrey.shade800,
       shape: RoundedRectangleBorder(
@@ -123,9 +130,22 @@ class _MainPageState extends State<MainPage> {
       child: ListTile(
         title: Text(emoji.toString()),
         subtitle: Text(emoji.name),
-        trailing: Text("ID: ${emoji.id}"),
+        trailing: Icon(
+          favoriteIds.contains(emoji.id) ? Icons.favorite : Icons.favorite_border,
+          color: color,
+        ),
         textColor: Colors.white,
       ),
     );
+  }
+
+  Future<void> loadPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? items = prefs.getStringList(keyPrefFavoriteIds);
+    if (items == null) return;
+
+    setState(() {
+      favoriteIds.addAll(items.map((e) => int.parse(e)));
+    });
   }
 }
