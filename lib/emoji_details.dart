@@ -50,7 +50,8 @@ class _EmojiDetailsPageState extends State<EmojiDetailsPage> {
     Emoji emoji = ModalRoute.of(context)?.settings.arguments as Emoji;
     var color =
         favoriteIds.contains(emoji.id) ? Colors.red.shade800 : Colors.black38;
-    var icon = favoriteIds.contains(emoji.id) ? Icons.favorite : Icons.favorite_border;
+    var icon =
+        favoriteIds.contains(emoji.id) ? Icons.favorite : Icons.favorite_border;
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Favorito', style: TextStyle(color: color)),
@@ -79,9 +80,8 @@ class _EmojiDetailsPageState extends State<EmojiDetailsPage> {
                 ),
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: emoji.emoji));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Copiado para a área de transferência'))
-                  );
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Copiado para a área de transferência')));
                 },
               ),
             ),
