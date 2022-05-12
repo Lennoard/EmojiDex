@@ -4,6 +4,7 @@ import 'package:emoji_dex/domain/emoji.dart';
 import 'package:emoji_dex/domain/emoji_repository.dart';
 import 'package:emoji_dex/domain/get_response_use_case.dart';
 import 'package:emoji_dex/emoji_details.dart';
+import 'package:emoji_dex/search/search_delegate.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
@@ -74,16 +75,30 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         title: const Text('EmojiDex'),
         backgroundColor: Colors.blueGrey.shade900,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: MySearchDelegate(),
+              );
+            },
+          )
+        ],
       ),
       body: PagedListView<int, Emoji>.separated(
         pagingController: _pagingController,
         builderDelegate: PagedChildBuilderDelegate<Emoji>(
-          itemBuilder: (context, item, index) => GestureDetector(
+          itemBuilder: (context, item, index) {
+            return GestureDetector(
+              child: buildListItem(item),
               onTap: () {
                 Navigator.of(context)
                     .pushNamed(EmojiDetailsPage.routeName, arguments: item);
               },
-              child: buildListItem(item)),
+            );
+          },
         ),
         separatorBuilder: (context, index) => const Spacer(),
       ),

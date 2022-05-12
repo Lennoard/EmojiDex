@@ -24,7 +24,15 @@ class EmojiRepositoryImpl extends EmojiRepository {
   }
 
   @override
-  Future<List<Emoji>> search(String query, int? limit, List<int>? categories, List<int>? subCategories) async {
+  Future<List<Emoji>> search(String query, int? limit) async {
+    var response = await _useCase.execute(
+        'https://api.emojisworld.fr/v1/search?q=$query&limit=${limit ?? 50}'
+    );
+    return _mapEmoji(response);
+  }
+
+  @override
+  Future<List<Emoji>> searchWithCategory(String query, int? limit, List<int>? categories, List<int>? subCategories) async {
     var response = await _useCase.execute(
         'https://api.emojisworld.fr/v1/search?q=$query&limit=${limit ?? 50}?categories=${categories ?? []}?sub_categories=${subCategories ?? []}'
     );
